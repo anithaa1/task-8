@@ -49,5 +49,36 @@ async function getById(id) {
         return { success: false, message: 'Internal Server Error' }
     }
 }
+async function updateProduct(updateDetail) {
+    debugger
+    try {
+        const changeDetail = await product.findOneAndUpdate( { id: updateDetail.id } );
 
- module.exports={createDetails:createDetails,getAllProduct:getAllProduct,getById:getById}
+        if (changeDetail) {
+            changeDetail.color = updateDetail.color,
+                changeDetail.price = updateDetail.price
+            await changeDetail.save();
+            return { isSuccess: true, message: "product details updated Successfully!!", data: changeDetail };
+        }
+        return { isSuccess: false, message: "Unable to update product Details!!" }
+    }
+    catch (err) {
+        return { isSuccess: false, message: "product details not Found", data: err };
+    }
+}
+async function DeleteProduct(deleteRecord) {
+    debugger
+    try {
+        const deleteDetails = await product.deleteOne( { id: deleteRecord.id });
+        if (deleteDetails) {
+            return { isSuccess: true, message: "product details deleted Successfully!!", data: deleteDetails };
+        }
+        return { isSuccess: false, message: "Unable to delete product Details!!" };
+    }
+    catch (err) {
+        return { isSuccess: false, message: "product details not deleted", data: err };
+    }
+}
+
+
+ module.exports={createDetails:createDetails,getAllProduct:getAllProduct,getById:getById, updateProduct: updateProduct, DeleteProduct: DeleteProduct}
