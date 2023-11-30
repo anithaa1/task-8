@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const services = require('../service/service');
 const helper = require('../lib/helper');
-const { check, validationResult } = require('express-validator')
+const { check, validationResult } = require('express-validator');
+const service = require('../service/service');
 
 
 
@@ -10,7 +11,7 @@ router.post('/', [
     check('productname').isLength({ min: 4, max: 7 }).withMessage('Product name must contain at least 4 characters'),
     check('brand').isLength({ min: 2 }).withMessage('Brand must contain at least 2 characters'),
     check('color').isLength({ min: 3 }).withMessage('Color must contain at least 3 characters'),
-    check('price').isLength({ min: 1 }).withMessage('price must be specified'),
+    check('price').isNumeric().withMessage('Price must be a valid number'),
 
   ], async (req, res) => {
     try {
@@ -60,4 +61,37 @@ router.get('/:id', async (req, res) => {
         return helper.SendErrorResponse(err, res);
     }
 });
+router.put('/:id', async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+      return res.status(400).json({
+          isSuccess: false,
+          message: 'Invalid Request',
+          data: errors
+      });
+    }
+  
+  try {
+      // var updateRecord = req.query;
+      var updateDetail = req.body;
+      var updateResult = await services.updateProduct(updateDetail);
+      return helper.SendResponse(res, updateResult);
+  }
+  catch (err) {
+      return helper.SendErrorResponse(err, res);
+  }
+})
+router.delete('/:id', async (req, res) => {
+  
+  try {
+      var deleteRecord = req.query;
+      var deleteResult = await services.DeleteProduct(deleteRecord);
+      return helper.SendResponse(res, deleteResult);
+  }
+  catch (err) {
+      return helper.SendErrorResponse(err, res);
+  }
+});
+
+
 module.exports = router;
